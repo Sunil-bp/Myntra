@@ -6,3 +6,6 @@ load session to requets.session : https://stackoverflow.com/questions/29563335/h
 access denied when trying with headless : https://stackoverflow.com/questions/54432980/how-to-access-a-site-via-a-headless-driver-without-being-denied-permission
 
 overall : good read : https://intoli.com/blog/making-chrome-headless-undetectable/
+
+
+switching from selenium to request  :: even with cookies, server aint responding  ! b****
