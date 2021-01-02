@@ -7,6 +7,8 @@ import os
 import requests
 import json
 from pprint import pprint
+import datetime
+import pickle
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -31,33 +33,51 @@ class Myntra:
         will use a cookie jar stored, by default, picked in the home directory.
         """
         self.local_dir = os.path.dirname(os.path.realpath(__file__))
-        self._driver_path = os.path.join(self.local_dir,"chromedriver.exe")
-        if not os.path.exists(self._driver_path):
-            raise Exception("Unable to find Driver file")
+        self._pickle_path =  os.path.join(self.local_dir, "_myntra_cookies.p")
 
-        #setting chrome driver options
-        self._options = Options()
-        self._options.headless = True
-        self._options.add_argument('user-agent={0}'.format(USER_AGENT))
-        self.driver = webdriver.Chrome(self._driver_path, options=self._options)
+        if os.path.exists(self._pickle_path):
+            print("Loading cookies from file")
+            self.cookies = pickle.load(open(self._pickle_path, "rb"))
 
-        ##get all cookie
-        self.driver.get(CORE)
-        print(self.driver.title)
-        with open("index.html", 'w', encoding="utf-8") as f:
-            f.write(self.driver.page_source)
-        print("Headless Chrome Initialized")
+            # Check cookie validity
+            expiry = min([c.get('expiry',99991098568) for c in self.cookies])
+            if datetime.datetime.now().timestamp() > expiry:
+                print("Cookies have expired ")
+                self.cookies = self._get_cookies()
 
-        self.cookies = self.driver.get_cookies()
         self.session = requests.Session()
 
         for cookie in self.cookies:
             self.session.cookies.set(cookie['name'], cookie['value'])
 
-        self.driver.quit()
         with open("config.json", "r") as f:
             config = json.load(f)
         self.header = config
+
+    def _get_cookies(self):
+        '''
+        Use selenium to load cookies if expired
+
+        :return:
+        '''
+        _driver_path = os.path.join(self.local_dir, "chromedriver.exe")
+        if not os.path.exists(_driver_path):
+            raise Exception("Unable to find Driver file")
+
+        # setting chrome driver options
+        _options = Options()
+        _options.headless = True
+        _options.add_argument('user-agent={0}'.format(USER_AGENT))
+        self.driver = webdriver.Chrome(_driver_path, options=_options)
+
+        ##get all cookie
+        self.driver.get(CORE)
+        print(self.driver.title)
+        print("Headless Chrome Initialized")
+        pickle.dump(self.driver.get_cookies(), open("_myntra_cookies.p", "wb"))
+        self.cookies = self.driver.get_cookies()
+        self.driver.quit()
+        return self.cookies
 
     def get_product_info(self,id):
         '''
@@ -66,8 +86,8 @@ class Myntra:
         '''
         response = self.session.get(PRODUCT_URL + id, timeout=10, headers=self.header)
         print(response.status_code)
-        with open("product_" + id + ".json", "w") as f:
-            json.dump(response.json(), f)
+        # with open("product_" + id + ".json", "w") as f:
+        #     json.dump(response.json(), f)
 
         product_data = (response.json())
         if response:
