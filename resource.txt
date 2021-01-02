@@ -9,3 +9,5 @@ overall : good read : https://intoli.com/blog/making-chrome-headless-undetectabl
 
 
 switching from selenium to request  :: even with cookies, server aint responding  ! b****
+			Added headers  
+			
