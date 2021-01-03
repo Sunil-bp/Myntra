@@ -11,6 +11,10 @@ import pickle
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import sqlite3
+try:
+    import create_db_tables
+except:
+    raise("create_db_tables.py file not found ")
 
 # If you are using Chrome version 87, please download ChromeDriver 87.0.4280.88
 CORE = "https://www.myntra.com/"
@@ -52,72 +56,12 @@ class Myntra:
         #set database move to function later
         #check all tables  and if needed
 
-        conn = sqlite3.connect('test.db')
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        tables = cursor.fetchall()
-        print(tables)
-        tables = [item for t in tables for item in t]
-        print(tables)
+        create_db_tables.check_db()
 
-        if len(tables) !=3:
-            if "PRODUCT" not in tables:
-                print("Crating product tables")
-                conn.execute('''CREATE TABLE PRODUCT
-                         (ID INT PRIMARY KEY     NOT NULL,
-                         PRODUCT_NAME           TEXT    NOT NULL,
-                         PRODUCT_ID             INT     NOT NULL,
-                         PRODUCT_URL            CHAR(200)   NULL,
-                         SIZE                   CHAR(50)    NOT NULL,
-                         IMAGE_URL              CHAR(200)  NOT NULL,
-                         articleType            CHAR(50)    NOT NULL,
-                         subCategory            CHAR(50)    NOT NULL,
-                         masterCategory         CHAR(50)    NOT NULL,
-                         gender                 CHAR(50)    NOT NULL,
-                         brand                  CHAR(50)    NOT NULL
-                         );''')
-
-                print("Created product table")
-            print(tables)
-            if "SIZE" not in tables:
-                print("Crating size tables")
-                conn.execute('''CREATE TABLE SIZE
-                                     (SIZE_ID    INT PRIMARY KEY     NOT NULL,
-                                     PRODUCT_ID             INT    NOT NULL,
-                                     SIZE                   CHAR(50)     NOT NULL,
-                                      FOREIGN KEY(PRODUCT_ID) REFERENCES PRODUCT(PRODUCT_ID)
-                                     );''')
-
-
-                print("Created size table")
-
-            if "PRICE" not in tables:
-                print("Crating PRICE tables")
-                conn.execute('''CREATE TABLE PRICE
-                                     (PRICE_ID    INT PRIMARY KEY     NOT NULL,
-                                     PRODUCT_ID             INT    NOT NULL,
-                                     SIZE_ID                  INT     NOT NULL,
-                                     PRICE                 INT   NOT NULL,
-                                     Date timestamp,
-                                      FOREIGN KEY(PRODUCT_ID) REFERENCES PRODUCT(PRODUCT_ID)
-                                      FOREIGN KEY(SIZE_ID) REFERENCES SIZE(SIZE_ID)
-                                     );''')
-
-                print("Created PRICE table")
-
-
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        tables = cursor.fetchall()
-        print(tables)
-
-        cursor.close()
-        conn.close()
-        wait  = input("hello")
+        wait = input("hello")
 
 
         self.add_product(size,product_url,product_id)
-
-
 
     def _get_cookies(self):
         '''
@@ -149,9 +93,9 @@ class Myntra:
         for product  in self.product_list:
             self.get_product_info(product)
 
-    def get_product_info(self, id):
+    def get_product_info(self, id,size):
         '''
-         Handles getting data from rest end point
+         Handles getting data from product rest end point
         :return:
         '''
         try:
@@ -180,14 +124,13 @@ class Myntra:
         if size not in ['m','s','l','xl','xxl','M','S','L','XL','XXL',"Onesize"]:
             # print("Please provide a valid size ")
             size = "All"
-        if product_id:
-            self.product_list[product_id] = {"ID":product_id,
-                                               "size":size}
-        elif product_url:
+        if product_url:
             product_id = product_url.split("/")[-2]
-            self.product_list[product_id] = {"ID": product_id,
-                                             "size": size}
 
+        if product_id:
+            conn = sqlite3.connect('_mynra.db')
+            conn.execute("INSERT INTO PRODUCT (ID,NAME,AGE,ADDRESS,SALARY) \
+                  VALUES (1, 'Paul', 32, 'California', 20000.00 )");
 
     def products_trcked(self):
         for product in self.product_list:

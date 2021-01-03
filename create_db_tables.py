@@ -1,7 +1,7 @@
 import sqlite3
 
 def check_db():
-    conn = sqlite3.connect('test.db')
+    conn = sqlite3.connect('_mynra.db')
     cursor = conn.cursor()
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
     tables = cursor.fetchall()
@@ -12,16 +12,16 @@ def check_db():
             print("Crating product tables")
             conn.execute('''CREATE TABLE PRODUCT
                      (ID INT PRIMARY KEY     NOT NULL,
-                     PRODUCT_NAME           TEXT    NOT NULL,
+                     PRODUCT_NAME           TEXT    ,
                      PRODUCT_ID             INT     NOT NULL,
-                     PRODUCT_URL            CHAR(200)   NULL,
-                     SIZE                   CHAR(50)    NOT NULL,
-                     IMAGE_URL              CHAR(200)  NOT NULL,
-                     articleType            CHAR(50)    NOT NULL,
-                     subCategory            CHAR(50)    NOT NULL,
-                     masterCategory         CHAR(50)    NOT NULL,
-                     gender                 CHAR(50)    NOT NULL,
-                     brand                  CHAR(50)    NOT NULL
+                     PRODUCT_URL            CHAR(200)    ,
+                     SIZE                   CHAR(50)    ,
+                     IMAGE_URL              CHAR(200)  ,
+                     articleType            CHAR(50)    ,
+                     subCategory            CHAR(50)    ,
+                     masterCategory         CHAR(50)    ,
+                     gender                 CHAR(50)    ,
+                     brand                  CHAR(50)    
                      );''')
 
             print("Created product table")
