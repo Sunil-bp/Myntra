@@ -93,10 +93,10 @@ class Myntra:
         for product  in self.product_list:
             self.get_product_info(product)
 
-    def get_product_info(self, id,size):
+    def get_product_info(self, id,size=None):
         '''
          Handles getting data from product rest end point
-        :return:
+        :return: tuple with all three db data
         '''
         try:
             response = self.session.get(PRODUCT_URL + str(id), timeout=10, headers=self.header)
@@ -110,6 +110,29 @@ class Myntra:
         product_data = response.json()
         if response:
             print(f"\nProduct name {product_data.get('style').get('name')}")
+            name = product_data.get('style').get('name')
+            mrp = product_data.get('style').get('mrp')
+            try:
+                image_url = product_data.get('style').get('media').get('albums')[0].get('images')[0].get('imageURL')
+            except Exception as e:
+                import logging
+                logging.exception()
+                print("Error reading image url")
+
+            #try any(**,None)
+            articleType = product_data.get('style').get('analytics').get('articleType')
+            subCategory = product_data.get('style').get('analytics').get('subCategory')
+            masterCategory = product_data.get('style').get('analytics').get('masterCategory')
+            gender = product_data.get('style').get('analytics').get('gender')
+            brand = product_data.get('style').get('analytics').get('brand')
+            size_list = []
+
+            if not size:
+
+
+
+
+
             self.product_list[id]["name"]= product_data.get('style').get('name')
             print(f"Product price {product_data.get('style').get('mrp')}")
             self.product_list[id]["price"]= product_data.get('style').get('mrp')

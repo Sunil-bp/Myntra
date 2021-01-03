@@ -14,6 +14,7 @@ def check_db():
                      (ID INT PRIMARY KEY     NOT NULL,
                      PRODUCT_NAME           TEXT    ,
                      PRODUCT_ID             INT     NOT NULL,
+                     PRODUCT_MRP             INT    ,
                      PRODUCT_URL            CHAR(200)    ,
                      SIZE                   CHAR(50)    ,
                      IMAGE_URL              CHAR(200)  ,
